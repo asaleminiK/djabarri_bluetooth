@@ -1,0 +1,1 @@
+cmd='C:/Users/ameen/.espressif/tools/cmake/3.13.4/bin/cmake.exe;-DSDKCONFIG=C:/Users/ameen/Desktop/esp32/gatt_server2/gatt_server/sdkconfig;-DIDF_PATH=C:/Users/ameen/Desktop/esp-idf-3;-DIDF_TARGET=esp32;-DPYTHON_DEPS_CHECKED=1;-DEXTRA_COMPONENT_DIRS=C:/Users/ameen/Desktop/esp-idf-3/components/bootloader;-DLEGACY_INCLUDE_COMMON_HEADERS=;-GNinja;<SOURCE_DIR><SOURCE_SUBDIR>'
