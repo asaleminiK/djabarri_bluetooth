@@ -72,8 +72,6 @@ static esp_attr_value_t gatts_demo_char1_val =
     .attr_value   = char1_str,
 };
 
-static uint16_t uuid_handle_table[256];
-
 static uint8_t adv_config_done = 0;
 #define adv_config_flag      (1 << 0)
 #define scan_rsp_config_flag (1 << 1)
@@ -89,7 +87,7 @@ static uint8_t raw_scan_rsp_data[] = {
 };
 #else
 
-static TaskHandle_t notify_handle;
+static TaskHandle_t notify_handle[GATTS_CHAR_UUID_TEST_NUM_CHARS];
 static int global_desc = 0;
 
 static uint8_t adv_service_uuid128[32] = {
@@ -203,6 +201,15 @@ static bool checkDescHandle(uint16_t handle){
         }
     }
     return false;
+}
+
+static uint8_t getDescHandleLocation(uint16_t handle){
+    for(int i = 0; i < GATTS_CHAR_UUID_TEST_NUM_CHARS; i++){
+        if(gl_profile_tab[PROFILE_A_APP_ID].descr_handle[i] == handle){
+            return i;
+        }
+    }
+    return GATTS_CHAR_UUID_TEST_NUM_CHARS;
 }
 
 static uint16_t notify_hadle_totask = 0;
@@ -424,7 +431,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                     if (a_property & ESP_GATT_CHAR_PROP_BIT_NOTIFY){
                         ESP_LOGI(GATTS_TAG, "notify enable");
                         notify_hadle_totask = param->write.handle;
-                        xTaskCreate(vNotifyTaskA, "Notify Task A", 6024, (void *) &notify_hadle_totask, tskIDLE_PRIORITY, &notify_handle);
+                        xTaskCreate(vNotifyTaskA, "Notify Task A", 6024, (void *) &notify_hadle_totask, tskIDLE_PRIORITY, &notify_handle[getDescHandleLocation(param->write.handle)]);
                     }
                 }else if (descr_value == 0x0002){
                     if (a_property & ESP_GATT_CHAR_PROP_BIT_INDICATE){
@@ -441,7 +448,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                 }
                 else if (descr_value == 0x0000){
                     ESP_LOGI(GATTS_TAG, "notify/indicate disable ");
-                    vTaskDelete(notify_handle);
+                    vTaskDelete(notify_handle[getDescHandleLocation(param->write.handle)]);
                 }else{
                     ESP_LOGE(GATTS_TAG, "unknown descr value");
                     esp_log_buffer_hex(GATTS_TAG, param->write.value, param->write.len);
