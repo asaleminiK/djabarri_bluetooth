@@ -1831,3 +1831,16 @@
 536	2041	6157871458345597	esp-idf/esp32/ld/esp32.project.ld	8b7e800f65c6eeea
 2041	5825	6157871496190169	gatt_server_demos.elf	9c3971de5d700424
 5826	6251	6157871500566775	.bin_timestamp	50d0f7ecfb6fe093
+53	102	6147270503436138	bootloader-prefix/src/bootloader-stamp/bootloader-build	86d7d758c2ac6e18
+53	102	6147270503436138	bootloader/bootloader.elf	86d7d758c2ac6e18
+53	102	6147270503436138	bootloader/bootloader.bin	86d7d758c2ac6e18
+53	102	6147270503436138	bootloader/bootloader.map	86d7d758c2ac6e18
+56	348	6157999239722020	esp-idf/main/CMakeFiles/__idf_main.dir/gatts_demo.c.obj	5867f1ba92c547bd
+350	399	6157999240241615	esp-idf/main/libmain.a	bd67d1401ed582f5
+399	1746	6157999253461799	esp-idf/esp32/ld/esp32.project.ld	8b7e800f65c6eeea
+1747	5459	6157999290718529	gatt_server_demos.elf	9c3971de5d700424
+5459	5830	6157999294496823	.bin_timestamp	50d0f7ecfb6fe093
+55	99	6147270503436138	bootloader-prefix/src/bootloader-stamp/bootloader-build	86d7d758c2ac6e18
+55	99	6147270503436138	bootloader/bootloader.elf	86d7d758c2ac6e18
+55	99	6147270503436138	bootloader/bootloader.bin	86d7d758c2ac6e18
+55	99	6147270503436138	bootloader/bootloader.map	86d7d758c2ac6e18
