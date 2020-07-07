@@ -1,16 +1,16 @@
 ESP-IDF Gatt Server & Client
 ========================
 
-This is a Bluedroid server demonstration. This project has no special purpose yet. There are two services, service A has two characteristics, and service B has one. This code is designed so a Bluetooth client can connect, write, and read from characterisitics, as well as listen to notifications.
+This is a Bluedroid server demonstration. This project has no special purpose yet. There are two services, service A has any number of user-definable characteristics, and service B has one. This code is designed so a Bluetooth client can connect, write, and read from characterisitics, as well as listen to notifications.
 
 BUGS
 ========================
 
-Service A does not support notifications yet. This is an issue with handles.
+No reported bugs.
 
 TODO
 ========================
 
--Create the Client codebase 
--Fix Notification handling
+-Enable client to read from multiple characteristics
+-Enable server to support 2 instances so iOS app can connect
 -Enable FreeRTOS for SPI
