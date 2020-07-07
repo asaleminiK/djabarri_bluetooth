@@ -11,6 +11,6 @@ No reported bugs.
 TODO
 ========================
 
--Enable client to read from multiple characteristics
--Enable server to support 2 instances so iOS app can connect
--Enable FreeRTOS for SPI
+-Enable client to read from multiple characteristics <br />
+-Enable server to support 2 instances so iOS app can connect <br />
+-Enable FreeRTOS for SPI <br />
