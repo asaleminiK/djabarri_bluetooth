@@ -39,12 +39,14 @@
 #define PROFILE_NUM      1
 #define PROFILE_A_APP_ID 0
 #define INVALID_HANDLE   0
+#define MAX_CHARS 20
 
 static const char remote_device_name[] = "BIOMED_DEMO";
 static bool connect    = false;
 static bool get_server = false;
 static esp_gattc_char_elem_t *char_elem_result   = NULL;
 static esp_gattc_descr_elem_t *descr_elem_result = NULL;
+static uint16_t num_chars = 0;
 
 /* Declare static functions */
 static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param);
@@ -83,7 +85,7 @@ struct gattc_profile_inst {
     uint16_t conn_id;
     uint16_t service_start_handle;
     uint16_t service_end_handle;
-    uint16_t char_handle;
+    uint16_t char_handle[MAX_CHARS];
     esp_bd_addr_t remote_bda;
 };
 
@@ -174,31 +176,36 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
                                                                      gl_profile_tab[PROFILE_A_APP_ID].service_end_handle,
                                                                      INVALID_HANDLE,
                                                                      &count);
+            
             if (status != ESP_GATT_OK){
                 ESP_LOGE(GATTC_TAG, "esp_ble_gattc_get_attr_count error");
             }
-
+            num_chars = count;
             if (count > 0){
                 char_elem_result = (esp_gattc_char_elem_t *)malloc(sizeof(esp_gattc_char_elem_t) * count);
                 if (!char_elem_result){
                     ESP_LOGE(GATTC_TAG, "gattc no mem");
                 }else{
-                    status = esp_ble_gattc_get_char_by_uuid( gattc_if,
+                   /* status = esp_ble_gattc_get_char_by_uuid( gattc_if,
                                                              p_data->search_cmpl.conn_id,
                                                              gl_profile_tab[PROFILE_A_APP_ID].service_start_handle,
                                                              gl_profile_tab[PROFILE_A_APP_ID].service_end_handle,
                                                              remote_filter_char_uuid,
                                                              char_elem_result,
-                                                             &count);
+                                                             &count);*/
+                    status = esp_ble_gattc_get_all_char(gattc_if, p_data->search_cmpl.conn_id, gl_profile_tab[PROFILE_A_APP_ID].service_start_handle, gl_profile_tab[PROFILE_A_APP_ID].service_end_handle, char_elem_result, &count, 0);
                     if (status != ESP_GATT_OK){
                         ESP_LOGE(GATTC_TAG, "esp_ble_gattc_get_char_by_uuid error");
                     }
                     ESP_LOGE(GATTC_TAG, "COUNT:%d", count);
                     /*  Every service have only one char in our 'ESP_GATTS_DEMO' demo, so we used first 'char_elem_result' */
-                    if (count > 0 && (char_elem_result[0].properties & ESP_GATT_CHAR_PROP_BIT_NOTIFY)){
-                        gl_profile_tab[PROFILE_A_APP_ID].char_handle = char_elem_result[0].char_handle;
-                        esp_ble_gattc_register_for_notify (gattc_if, gl_profile_tab[PROFILE_A_APP_ID].remote_bda, char_elem_result[0].char_handle);
+                    for(int i = 0; i < count; i++){
+                        if (char_elem_result[i].properties & ESP_GATT_CHAR_PROP_BIT_NOTIFY){
+                            gl_profile_tab[PROFILE_A_APP_ID].char_handle[i] = char_elem_result[i].char_handle;
+                        }
                     }
+                    esp_ble_gattc_register_for_notify (gattc_if, gl_profile_tab[PROFILE_A_APP_ID].remote_bda, char_elem_result[0].char_handle);
+                    esp_ble_gattc_register_for_notify (gattc_if, gl_profile_tab[PROFILE_A_APP_ID].remote_bda, char_elem_result[1].char_handle);
                 }
                 /* free char_elem_result */
                 free(char_elem_result);
@@ -219,7 +226,7 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
                                                                          ESP_GATT_DB_DESCRIPTOR,
                                                                          gl_profile_tab[PROFILE_A_APP_ID].service_start_handle,
                                                                          gl_profile_tab[PROFILE_A_APP_ID].service_end_handle,
-                                                                         gl_profile_tab[PROFILE_A_APP_ID].char_handle,
+                                                                         gl_profile_tab[PROFILE_A_APP_ID].char_handle[0],
                                                                          &count);
             if (ret_status != ESP_GATT_OK){
                 ESP_LOGE(GATTC_TAG, "esp_ble_gattc_get_attr_count error");
@@ -285,7 +292,7 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
         }
         esp_ble_gattc_write_char( gattc_if,
                                   gl_profile_tab[PROFILE_A_APP_ID].conn_id,
-                                  gl_profile_tab[PROFILE_A_APP_ID].char_handle,
+                                  gl_profile_tab[PROFILE_A_APP_ID].char_handle[1],
                                   sizeof(write_char_data),
                                   write_char_data,
                                   ESP_GATT_WRITE_TYPE_RSP,
@@ -304,7 +311,7 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
             break;
         }
         ESP_LOGI(GATTC_TAG, "write char success ");
-        esp_ble_gattc_read_char(gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id, gl_profile_tab[PROFILE_A_APP_ID].char_handle, ESP_GATT_AUTH_REQ_NONE);
+        esp_ble_gattc_read_char(gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id, gl_profile_tab[PROFILE_A_APP_ID].char_handle[1], ESP_GATT_AUTH_REQ_NONE);
         break;
     case ESP_GATTC_READ_CHAR_EVT:
         if(p_data->read.status != ESP_GATT_OK){
